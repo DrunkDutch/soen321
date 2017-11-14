@@ -33,3 +33,4 @@ def get_captcha_from_number(number):
 
 if __name__ == "__main__":
     print(get_captcha_from_number(2))
+    print(map_dict['ABC'])

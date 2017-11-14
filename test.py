@@ -6,12 +6,12 @@ import itertools
 import pickle
 import os
 from math import factorial
+import sys
 
 
 # https://stackoverflow.com/questions/16453188/counting-permuations-in-python
 def npermutations(input_list, size):
     num = factorial(len(input_list))
-    # mults = Counter(input_list).values()
     den = factorial(len(input_list) - size)
     return num / den
 
@@ -21,9 +21,6 @@ RAW_INPUT_CHARS = ['A', 'B', 'C', 'D', 'E']
 SIZE = 3
 OUTPUT_SIZE = int(npermutations(RAW_INPUT_CHARS, SIZE))  # Number of permutations
 map_dict = pickle.load(open("map.pk1", "rb"))
-# image = ImageCaptcha()
-# image.generate_image("abcd")
-# image.write('abcd', 'out2.png')
 net = prn.CreateNN([INPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE])
 
 
@@ -88,16 +85,35 @@ def prepare_image(output_folder, id):
     in_image = Image.open(image_location)
     in_image = in_image.convert('L')
     image_array = np.asarray(in_image).copy()
-    # Convert image to black and white
-    image_array[image_array < 200] = 0  # Black
-    image_array[image_array >= 201] = 255  # White
+    # Convert image to black and white in a binary manner to minimize calculations
+    image_array[image_array < 200] = 1  # Black
+    image_array[image_array >= 201] = 0  # White
     vector = np.empty(0, dtype="uint8")
     for ar in image_array:
-        vector = np.concatenate((vector, ar),0)
-    return vector
+        vector = np.concatenate((vector, ar), 0)
+    return vector, number
 
 
 if __name__ == "__main__":
+    """
+    To generate the map between string and vector, uncomment generate_map_dict below (not needed, map is stored as 
+        map.pk1 and included in repo
+    To generate new captchas uncomment generate_captchas and change the first parameter to the desired output directory
+    To load and prepare a captcha for testing or training simply change the parameters in the prepare_image line
+        first parameter is source folder, second parameter is 1-indexed of the permutation
+    To load the net from an existing csv dump uncomment the prn.loadNN statement to load from desired file
+        Default for repo is that the net.csv file does not exist and as such this line should remain commented
+        Until training and saving is run atleast once
+    To train the network uncomment the prn.train line and the prn.saveNN line to train the network and save it as the 
+        csv file specified as parameter of prn.saveNN    
+    """
     # generate_map_dict(SIZE)
-    # generate_captchas("test", SIZE)
-    vec = prepare_image("images", 1)
+    # generate_captchas("smaller", SIZE)
+    vec, captcha = prepare_image("images", 1)
+    vec = np.reshape(vec, (INPUT_SIZE, 1))
+    test_array = map_dict[captcha]
+    test_array = np.reshape(test_array, (60, 1))
+    # net = prn.loadNN("net.csv")
+    # map_dict = None
+    # net = prn.train_LM(vec, test_array, net, k_max=1)
+    # prn.saveNN(net, "net.csv")

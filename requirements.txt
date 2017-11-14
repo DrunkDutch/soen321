@@ -1,5 +1,9 @@
 captcha==0.2.4
 numpy==1.13.3
 olefile==0.44
+pandas==0.21.0
 Pillow==4.3.0
 pyrenn==0.1
+python-dateutil==2.6.1
+pytz==2017.3
+six==1.11.0
