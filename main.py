@@ -17,7 +17,7 @@ def npermutations(input_list, size):
 
 
 INPUT_SIZE = 9600  # Captcha size is 160 * 60
-RAW_INPUT_CHARS = ['A', 'B', 'C', 'D', 'E']
+RAW_INPUT_CHARS = ['A', 'B', 'C', 'D']
 SIZE = 3
 OUTPUT_SIZE = int(npermutations(RAW_INPUT_CHARS, SIZE))  # Number of permutations
 map_dict = pickle.load(open("map.pk1", "rb"))
@@ -30,7 +30,7 @@ def dictionary_iterator(dict):
 
 
 def get_captcha_from_number(number):
-    temp_map = [0]*60
+    temp_map = [0]*24
     temp_map[number-1] = 1
     temp_map = np.array(temp_map)
     gen = iter(dictionary_iterator(map_dict))
@@ -50,7 +50,7 @@ def generate_map_dict(size):
     generator = enumerate(itertools.permutations(RAW_INPUT_CHARS, size))
     map_dict = {}
     for index, perm in generator:
-        vector_rep = [0] * 60
+        vector_rep = [0] * 24
         vector_rep[index] = 1
         print(vector_rep)
         print("{} {}".format(index, perm))
@@ -107,13 +107,14 @@ if __name__ == "__main__":
     To train the network uncomment the prn.train line and the prn.saveNN line to train the network and save it as the 
         csv file specified as parameter of prn.saveNN    
     """
-    # generate_map_dict(SIZE)
-    # generate_captchas("smaller", SIZE)
-    vec, captcha = prepare_image("images", 1)
+    print(OUTPUT_SIZE)
+    #generate_map_dict(SIZE)
+    #generate_captchas("smaller", SIZE)
+    vec, captcha = prepare_image("smaller", 1)
     vec = np.reshape(vec, (INPUT_SIZE, 1))
     test_array = map_dict[captcha]
-    test_array = np.reshape(test_array, (60, 1))
+    test_array = np.reshape(test_array, (24, 1))
     # net = prn.loadNN("net.csv")
     # map_dict = None
-    # net = prn.train_LM(vec, test_array, net, k_max=1)
-    # prn.saveNN(net, "net.csv")
+    net = prn.train_LM(vec, test_array, net, k_max=1)
+    prn.saveNN(net, "net.csv")
