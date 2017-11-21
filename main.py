@@ -9,6 +9,7 @@ from math import factorial
 import sys
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.models import load_model
 
 
 # https://stackoverflow.com/questions/16453188/counting-permuations-in-python
@@ -119,14 +120,24 @@ if __name__ == "__main__":
     # net = prn.loadNN("net.csv")
     # map_dict = None
     net = Sequential()
-    net.add(Dense(24, input_dim=9600, activation='relu'))
-    net.add(Dense(8, activation='relu'))
-    net.add(Dense(8, activation='relu'))
+    net.add(Dense(9600, input_dim=9600, activation='relu'))
+    net.add(Dense(60, activation='relu'))
+    net.add(Dense(60, activation='relu'))
     net.add(Dense(60, activation='sigmoid'))
     net.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    net.fit(vec, test_array, epochs=1000)
+    for i in range(1,60):
+        vec, captcha = prepare_image("images", i)
+        vec = vec.transpose(0)
+        vec = np.reshape(vec, (1, INPUT_SIZE))
+        test_array = map_dict[captcha]
+        test_array = np.reshape(test_array, (1, 60))
+        net.fit(vec, test_array, epochs=100, batch_size=10)
 
-    vec, captcha = prepare_image('test', 1)
+    net.save("test.h5")
+
+    net = load_model("test.h5")
+
+    vec, captcha = prepare_image('images', 1)
     vec = vec.transpose(0)
     vec = np.reshape(vec, (1, INPUT_SIZE))
     test_array = map_dict[captcha]
@@ -134,8 +145,10 @@ if __name__ == "__main__":
     scores = net.evaluate(vec, test_array)
     print("\n%s: %.2f%%" % (net.metrics_names[1], scores[1] * 100))
 
+
+
     pred = net.predict(vec, batch_size=1, verbose=1)
     print(pred.flatten())
-    print(pred.flatten().argmax())
+    print(pred.argmax())
     # net = prn.train_LM(vec, test_array, net, k_max=1)
     # prn.saveNN(net, "net.csv")
