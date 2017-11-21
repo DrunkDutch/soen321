@@ -11,3 +11,10 @@ x = np.expand_dims(x, axis=0)
 preds = test_model.predict_classes(x)
 prob = test_model.predict_proba(x)
 print(preds, probs)
+
+
+
+Train extended
+https://gist.github.com/ritazh/c7461e50f5a5eada7d8b167b923f324f
+Predict extended
+https://gist.github.com/ritazh/a7c88875053c1106e407300fc4f1d8d6
