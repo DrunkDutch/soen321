@@ -77,9 +77,11 @@ def generate_captchas(output_folder, size):
     generator = enumerate(itertools.permutations(RAW_INPUT_CHARS, size))
     for index, perm in generator:
         output = "".join(perm)
-        image = ImageCaptcha()
-        image.generate_image(output)
-        image.write(output, "./{}/{}.png".format(output_folder, output))
+        get_out_dir("{}/{}".format(output_folder, output))
+        for i in range(0,50):
+            image = ImageCaptcha()
+            image.generate_image(output)
+            image.write(output, "./{}/{}/{}.png".format(output_folder, output, i))
 
 
 def prepare_image(output_folder, id):
@@ -111,27 +113,27 @@ if __name__ == "__main__":
         csv file specified as parameter of prn.saveNN    
     """
     # generate_map_dict(SIZE)
-    # generate_captchas("smaller", SIZE)
+    generate_captchas("train", SIZE)
     vec, captcha = prepare_image("images", 1)
     vec = vec.transpose(0)
     vec = np.reshape(vec, (1, INPUT_SIZE))
     test_array = map_dict[captcha]
     test_array = np.reshape(test_array, (1,60))
-    # net = prn.loadNN("net.csv")
-    # map_dict = None
+    net = prn.loadNN("net.csv")
+    map_dict = None
     net = Sequential()
-    net.add(Dense(9600, input_dim=9600, activation='relu'))
+    net.add(Dense(60, input_dim=9600, activation='relu'))
     net.add(Dense(60, activation='relu'))
     net.add(Dense(60, activation='relu'))
     net.add(Dense(60, activation='sigmoid'))
-    net.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    net.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
     for i in range(1,60):
         vec, captcha = prepare_image("images", i)
         vec = vec.transpose(0)
         vec = np.reshape(vec, (1, INPUT_SIZE))
         test_array = map_dict[captcha]
         test_array = np.reshape(test_array, (1, 60))
-        net.fit(vec, test_array, epochs=100, batch_size=10)
+        net.fit(vec, test_array, epochs=10, batch_size=10)
 
     net.save("test.h5")
 
@@ -141,14 +143,17 @@ if __name__ == "__main__":
     vec = vec.transpose(0)
     vec = np.reshape(vec, (1, INPUT_SIZE))
     test_array = map_dict[captcha]
-    test_array = np.reshape(test_array, (1,60))
+    test_array = np.reshape(test_array, (1, 60))
     scores = net.evaluate(vec, test_array)
     print("\n%s: %.2f%%" % (net.metrics_names[1], scores[1] * 100))
 
 
-
-    pred = net.predict(vec, batch_size=1, verbose=1)
+    sum = 0
+    for i in range(0, 100):
+        pred = net.predict(vec, batch_size=1, verbose=0)
+        if pred.flatten().argmax() == 0:
+                sum += 1
     print(pred.flatten())
     print(pred.argmax())
-    # net = prn.train_LM(vec, test_array, net, k_max=1)
-    # prn.saveNN(net, "net.csv")
+
+    print(sum)
