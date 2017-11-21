@@ -7,6 +7,8 @@ import pickle
 import os
 from math import factorial
 import sys
+from keras.models import Sequential
+from keras.layers import Dense
 
 
 # https://stackoverflow.com/questions/16453188/counting-permuations-in-python
@@ -21,7 +23,7 @@ RAW_INPUT_CHARS = ['A', 'B', 'C', 'D', 'E']
 SIZE = 3
 OUTPUT_SIZE = int(npermutations(RAW_INPUT_CHARS, SIZE))  # Number of permutations
 map_dict = pickle.load(open("map.pk1", "rb"))
-net = prn.CreateNN([INPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE])
+# net = prn.CreateNN([INPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE])
 
 
 def dictionary_iterator(dict):
@@ -110,10 +112,30 @@ if __name__ == "__main__":
     # generate_map_dict(SIZE)
     # generate_captchas("smaller", SIZE)
     vec, captcha = prepare_image("images", 1)
-    vec = np.reshape(vec, (INPUT_SIZE, 1))
+    vec = vec.transpose(0)
+    vec = np.reshape(vec, (1, INPUT_SIZE))
     test_array = map_dict[captcha]
-    test_array = np.reshape(test_array, (60, 1))
+    test_array = np.reshape(test_array, (1,60))
     # net = prn.loadNN("net.csv")
     # map_dict = None
+    net = Sequential()
+    net.add(Dense(24, input_dim=9600, activation='relu'))
+    net.add(Dense(8, activation='relu'))
+    net.add(Dense(8, activation='relu'))
+    net.add(Dense(60, activation='sigmoid'))
+    net.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    net.fit(vec, test_array, epochs=1000)
+
+    vec, captcha = prepare_image('test', 1)
+    vec = vec.transpose(0)
+    vec = np.reshape(vec, (1, INPUT_SIZE))
+    test_array = map_dict[captcha]
+    test_array = np.reshape(test_array, (1,60))
+    scores = net.evaluate(vec, test_array)
+    print("\n%s: %.2f%%" % (net.metrics_names[1], scores[1] * 100))
+
+    pred = net.predict(vec, batch_size=1, verbose=1)
+    print(pred.flatten())
+    print(pred.flatten().argmax())
     # net = prn.train_LM(vec, test_array, net, k_max=1)
     # prn.saveNN(net, "net.csv")
