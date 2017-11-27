@@ -113,7 +113,7 @@ if __name__ == "__main__":
         csv file specified as parameter of prn.saveNN    
     """
     # generate_map_dict(SIZE)
-    generate_captchas("train", SIZE)
+    generate_captchas("images", SIZE)
     vec, captcha = prepare_image("images", 1)
     vec = vec.transpose(0)
     vec = np.reshape(vec, (1, INPUT_SIZE))
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         vec = np.reshape(vec, (1, INPUT_SIZE))
         test_array = map_dict[captcha]
         test_array = np.reshape(test_array, (1, 60))
-        net.fit(vec, test_array, epochs=10, batch_size=10)
+        net.fit(vec, test_array, epochs=1, batch_size=10)
 
     net.save("test.h5")
 
