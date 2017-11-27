@@ -113,47 +113,47 @@ if __name__ == "__main__":
         csv file specified as parameter of prn.saveNN    
     """
     # generate_map_dict(SIZE)
-    generate_captchas("images", SIZE)
-    vec, captcha = prepare_image("images", 1)
-    vec = vec.transpose(0)
-    vec = np.reshape(vec, (1, INPUT_SIZE))
-    test_array = map_dict[captcha]
-    test_array = np.reshape(test_array, (1,60))
-    net = prn.loadNN("net.csv")
-    map_dict = None
-    net = Sequential()
-    net.add(Dense(60, input_dim=9600, activation='relu'))
-    net.add(Dense(60, activation='relu'))
-    net.add(Dense(60, activation='relu'))
-    net.add(Dense(60, activation='sigmoid'))
-    net.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-    for i in range(1,60):
-        vec, captcha = prepare_image("images", i)
-        vec = vec.transpose(0)
-        vec = np.reshape(vec, (1, INPUT_SIZE))
-        test_array = map_dict[captcha]
-        test_array = np.reshape(test_array, (1, 60))
-        net.fit(vec, test_array, epochs=1, batch_size=10)
+    generate_captchas("train", SIZE)
+#    vec, captcha = prepare_image("images", 1)
+#    vec = vec.transpose(0)
+#    vec = np.reshape(vec, (1, INPUT_SIZE))
+#    test_array = map_dict[captcha]
+#    test_array = np.reshape(test_array, (1,60))
+#    net = prn.loadNN("net.csv")
+#    map_dict = None
+#    net = Sequential()
+#    net.add(Dense(60, input_dim=9600, activation='relu'))
+#    net.add(Dense(60, activation='relu'))
+#    net.add(Dense(60, activation='relu'))
+#    net.add(Dense(60, activation='sigmoid'))
+#    net.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+#    for i in range(1,60):
+#        vec, captcha = prepare_image("images", i)
+#        vec = vec.transpose(0)
+#        vec = np.reshape(vec, (1, INPUT_SIZE))
+#        test_array = map_dict[captcha]
+#        test_array = np.reshape(test_array, (1, 60))
+#        net.fit(vec, test_array, epochs=1, batch_size=10)
 
-    net.save("test.h5")
+ #   net.save("test.h5")
 
-    net = load_model("test.h5")
+ #   net = load_model("test.h5")
 
-    vec, captcha = prepare_image('images', 1)
-    vec = vec.transpose(0)
-    vec = np.reshape(vec, (1, INPUT_SIZE))
-    test_array = map_dict[captcha]
-    test_array = np.reshape(test_array, (1, 60))
-    scores = net.evaluate(vec, test_array)
-    print("\n%s: %.2f%%" % (net.metrics_names[1], scores[1] * 100))
+#    vec, captcha = prepare_image('images', 1)
+#    vec = vec.transpose(0)
+#    vec = np.reshape(vec, (1, INPUT_SIZE))
+#    test_array = map_dict[captcha]
+#    test_array = np.reshape(test_array, (1, 60))
+#    scores = net.evaluate(vec, test_array)
+#    print("\n%s: %.2f%%" % (net.metrics_names[1], scores[1] * 100))
 
 
-    sum = 0
-    for i in range(0, 100):
-        pred = net.predict(vec, batch_size=1, verbose=0)
-        if pred.flatten().argmax() == 0:
-                sum += 1
-    print(pred.flatten())
-    print(pred.argmax())
+ #   sum = 0
+ #   for i in range(0, 100):
+ #       pred = net.predict(vec, batch_size=1, verbose=0)
+ #       if pred.flatten().argmax() == 0:
+ #               sum += 1
+ #   print(pred.flatten())
+ #   print(pred.argmax())
 
-    print(sum)
+  #  print(sum)

@@ -29,15 +29,15 @@ test_model.add(Flatten())
 test_model.add(Dense(64))
 test_model.add(Activation('relu'))
 test_model.add(Dropout(0.5))
-test_model.add(Dense(1))
+test_model.add(Dense(60))
 test_model.add(Activation('sigmoid'))
 
 test_model = load_model('first_model.h5')
 
 
 def predict(basedir, model):
-    for i in range(1401, 1411):
-        path = basedir + str(i) + '.jpg'
+    for i in range(1, 50):
+        path = basedir + '/' + str(i) + '.png'
 
         img = load_img(path, False, target_size=(img_width, img_height))
         x = img_to_array(img)
@@ -47,10 +47,10 @@ def predict(basedir, model):
         print(probs)
 
 
-basedir = "images/ABC."
+basedir = "images/ABC"
 predict(basedir, test_model)
 
-basedir = "images/BDA."
+basedir = "images/BDA"
 predict(basedir, test_model)
 
 print('done')
