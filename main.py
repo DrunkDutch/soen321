@@ -78,7 +78,7 @@ def generate_captchas(output_folder, size):
     for index, perm in generator:
         output = "".join(perm)
         get_out_dir("{}/{}".format(output_folder, output))
-        for i in range(0,50):
+        for i in range(0,500):
             image = ImageCaptcha()
             image.generate_image(output)
             image.write(output, "./{}/{}/{}.png".format(output_folder, output, i))

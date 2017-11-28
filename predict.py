@@ -43,14 +43,19 @@ def predict(basedir, model):
         x = img_to_array(img)
         x = np.expand_dims(x, axis=0)
         preds = model.predict_classes(x)
+        #print(preds)
+        pred = model.predict(x)
+        if pred.flatten().argmax() == 0:
+           print("Correct")
         probs = model.predict_proba(x)
-        print(probs)
+        proba = model.predict(x)
+        print(proba.argmax(axis=-1))
 
 
 basedir = "images/ABC"
 predict(basedir, test_model)
 
-basedir = "images/BDA"
-predict(basedir, test_model)
+#basedir = "images/BDA"
+#predict(basedir, test_model)
 
 print('done')
