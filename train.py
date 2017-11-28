@@ -1,9 +1,11 @@
+import tensorflow
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 from keras.optimizers import SGD
+from keras.callbacks import LearningRateScheduler, ModelCheckpoint
 
 # dimensions of our images.
 img_width, img_height = 160, 60
@@ -22,30 +24,38 @@ else:
     input_shape = (img_width, img_height, 3)
 
 model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=input_shape))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(32, (3, 3)))
-model.add(Activation('relu'))
+model.add(Conv2D(32, (3, 3),
+                 input_shape=(input_shape),
+                 activation='relu'))
+model.add(Conv2D(32, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.2))
 
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
+model.add(Conv2D(64, (3, 3),
+                 activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.2))
+
+model.add(Conv2D(128, (3, 3),
+                 activation='relu'))
+model.add(Conv2D(128, (3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.2))
 
 model.add(Flatten())
-model.add(Dense(64))
-model.add(Activation('relu'))
+model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(60))
-model.add(Activation('softmax'))
+model.add(Dense(60, activation='softmax'))
 lr = 0.01
 sgd = SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy',
               optimizer=sgd,
               metrics=['accuracy'])
 
+def lr_schedule(epoch):
+    return lr * (0.1 ** int(epoch / 10))
 
 # this is the augmentation configuration we will use for training
 train_datagen = ImageDataGenerator(
@@ -78,7 +88,10 @@ model.fit_generator(
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,
     validation_data=validation_generator,
-    validation_steps=nb_validation_samples // batch_size)
+    validation_steps=nb_validation_samples // batch_size,
+    callbacks=[LearningRateScheduler(lr_schedule),
+               ModelCheckpoint('model.h5', save_best_only=True)]
+)
 
 print("fit_generator")
 model.save('first_model.h5')
