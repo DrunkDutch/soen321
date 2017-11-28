@@ -3,7 +3,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
-
+from keras.optimizers import SGD
 
 # dimensions of our images.
 img_width, img_height = 160, 60
@@ -11,9 +11,9 @@ img_width, img_height = 160, 60
 train_data_dir = 'images'
 validation_data_dir = 'train'
 nb_train_samples = 1000*60
-nb_validation_samples = 500*60
+nb_validation_samples = 250*60
 epochs = 50
-batch_size = 16
+batch_size = 50
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -40,10 +40,12 @@ model.add(Activation('relu'))
 model.add(Dropout(0.5))
 model.add(Dense(60))
 model.add(Activation('softmax'))
-
+lr = 0.01
+sgd = SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy',
-              optimizer='rmsprop',
+              optimizer=sgd,
               metrics=['accuracy'])
+
 
 # this is the augmentation configuration we will use for training
 train_datagen = ImageDataGenerator(
