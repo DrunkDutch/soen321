@@ -1,3 +1,4 @@
+from keras.callbacks import ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
@@ -13,7 +14,7 @@ validation_data_dir = 'train'
 nb_train_samples = 60000
 nb_validation_samples = 15000
 epochs = 50
-batch_size = 16
+batch_size = 200
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -35,7 +36,7 @@ model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())
-model.add(Dense(64))
+model.add(Dense(3))
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
 model.add(Dense(60))
@@ -75,10 +76,10 @@ model.fit_generator(
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,
     validation_data=validation_generator,
-    validation_steps=nb_validation_samples // batch_size)
+    validation_steps=nb_validation_samples // batch_size, callbacks=[ModelCheckpoint('model_test.h5', save_best_only=True)])
 
 print("fit_generator")
-model.save('first_model.h5')
-model.save_weights('first_weights.h5')
+model.save('first_model_simple.h5')
+model.save_weights('first_weights_simple.h5')
 
 print("saved model and weights")

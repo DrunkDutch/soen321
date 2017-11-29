@@ -78,7 +78,7 @@ def generate_captchas(output_folder, size):
     for index, perm in generator:
         output = "".join(perm)
         get_out_dir("{}/{}".format(output_folder, output))
-        for i in range(0,50):
+        for i in range(250,500):
             image = ImageCaptcha()
             image.generate_image(output)
             image.write(output, "./{}/{}/{}.png".format(output_folder, output, i))
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         csv file specified as parameter of prn.saveNN    
     """
     # generate_map_dict(SIZE)
-    generate_captchas("train", SIZE)
+    generate_captchas("test", SIZE)
 #    vec, captcha = prepare_image("images", 1)
 #    vec = vec.transpose(0)
 #    vec = np.reshape(vec, (1, INPUT_SIZE))
