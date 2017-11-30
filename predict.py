@@ -107,6 +107,10 @@ y_pred = preds > 0.95
 
 for index, result in enumerate(y_pred):
     i = index//500
+    try:
+        print(get_captcha_from_number(result.tolist().index(True)))
+    except ValueError:
+        print("No match found")
     if result[i] == True:
         sum += 1
 
